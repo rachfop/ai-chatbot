@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "ai-chatbot"
+version = "0.1.0"
+description = "Using Telegram as an interface for Kapa AI, backed by a Temporal Workflow."
+authors = ["rachfop <prachford@icloud.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+temporalio = "^1.4.0"
+python-telegram-bot = "^20.7"
+aiohttp = "^3.9.1"
+python-dotenv = "^1.0.0"
+
+[tool.poetry.dev-dependencies]
+ruff = "^0.1.6"
+
+[tool.poe.tasks]
+format = [{cmd = "ruff format ."}]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
