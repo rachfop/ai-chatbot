@@ -1,16 +1,12 @@
 import asyncio
 
+from activities.activities import process_and_respond, send_start_message
 from temporalio.client import Client
 from temporalio.worker import Worker
-
-from activities.activities import (
-    process_and_respond,
-    query_kapa_api,
-    send_start_message,
-)
 from workflows.workflows import HandleStartCommand, HandleUserMessage
 
 interrupt_event = asyncio.Event()
+
 
 async def main() -> None:
     client = await Client.connect("localhost:7233")
@@ -19,8 +15,9 @@ async def main() -> None:
         client,
         task_queue="my-task-queue",
         workflows=[HandleStartCommand, HandleUserMessage],
-        activities=[send_start_message, process_and_respond, query_kapa_api],
+        activities=[send_start_message, process_and_respond],
     )
+    print("Starting worker")
     await worker.run()
     try:
         # Wait indefinitely until the interrupt event is set

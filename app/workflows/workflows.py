@@ -4,7 +4,12 @@ from datetime import timedelta
 from temporalio import workflow
 
 with workflow.unsafe.imports_passed_through():
-    from activities.activities import BotParams, process_and_respond, send_start_message
+    from activities.activities import (
+        BotParams,
+        process_and_respond,
+        send_start_message,
+        send_tweet_message,
+    )
 
 
 @workflow.defn

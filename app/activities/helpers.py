@@ -1,17 +1,19 @@
-import re
-
 def escape_markdown(text: str) -> str:
     """
-    Escape markdown special characters.
+    Escapes special characters for Telegram Markdown V2 to make the text more readable.
 
     Args:
-        text (str): The text to be converted.
+        text (str): The text to be formatted for Telegram Markdown V2.
 
     Returns:
-        str: The escaped text.
+        str: The formatted text.
     """
-    # Regular expression pattern for Markdown special characters
-    pattern = r'([_\*\[\]\(\)~`>#\+\-=|{}\.!])'
 
-    # Replace each special character with a backslash followed by the character
-    return re.sub(pattern, r'\\\1', text)
+    # Characters that need escaping in Telegram Markdown V2, only when used in special contexts
+    special_chars = ['_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!']
+
+    # Escape only if these characters are not already escaped
+    for char in special_chars:
+        text = text.replace(char, f'\\{char}')
+
+    return text

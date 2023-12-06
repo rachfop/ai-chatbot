@@ -1,7 +1,8 @@
 import logging
 import os
+from typing import Optional
 
-from activities.activities import BotParams
+from activities.activities import BotParams, send_tweet_message
 from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import (
@@ -20,7 +21,6 @@ load_dotenv()
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
 
-# Function to create and return Temporal client
 async def get_client() -> Client:
     return await Client.connect("localhost:7233")
 
@@ -29,7 +29,13 @@ async def get_client() -> Client:
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     client = await get_client()
     chat_id = update.effective_chat.id
-    result = await execute_start_command(client, chat_id)
+    bot_params = BotParams(message="", chat_id=chat_id)
+    result = await client.execute_workflow(
+        HandleStartCommand.run,
+        bot_params,
+        id=f"start-command-{chat_id}",
+        task_queue="my-task-queue",
+    )
     await update.message.reply_text(result, parse_mode="MarkdownV2")
 
 
@@ -42,30 +48,15 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         "Your ChatBot is thinking and your question has been received\. You will get a response in about 10 seconds\.",
         parse_mode="MarkdownV2",
     )
-    result = await execute_user_message(client, message, chat_id)
-    await update.message.reply_text(result, parse_mode="MarkdownV2")
-
-
-# Function to execute start command workflow
-async def execute_start_command(client, chat_id) -> str:
-    bot_params = BotParams(message="", chat_id=chat_id)
-    return await client.execute_workflow(
-        HandleStartCommand.run,
-        bot_params,
-        id=f"start-command-{chat_id}",
-        task_queue="my-task-queue",
-    )
-
-
-# Function to execute user message workflow
-async def execute_user_message(client, message, chat_id) -> str:
     bot_params = BotParams(message=message, chat_id=chat_id)
-    return await client.execute_workflow(
+    result = await client.execute_workflow(
         HandleUserMessage.run,
         bot_params,
         id=f"user-message-{chat_id}",
         task_queue="my-task-queue",
     )
+
+    await update.message.reply_text(result, parse_mode="MarkdownV2")
 
 
 # Main function to run the bot
